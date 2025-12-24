@@ -75,7 +75,7 @@ class _PolylineHomeScreenState extends State<PolylineHomeScreen> {
           width: 5,
           startCap: Cap.roundCap,
           endCap: Cap.roundCap,
-          // patterns: [PatternItem.dot],
+          patterns: [PatternItem.dot],
         ),
       );
     }
