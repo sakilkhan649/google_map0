@@ -112,7 +112,7 @@ class _UsercurrentlocationState extends State<Usercurrentlocation> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CustomMarkar()),
+                  MaterialPageRoute(builder: (context) => CustomInfoPlace()),
                 );
               },
               style: ButtonStyle(

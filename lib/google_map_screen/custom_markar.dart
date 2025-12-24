@@ -1,13 +1,12 @@
 import 'dart:async';
+
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../utils/image/images.dart';
-import 'custom_info_place.dart';
+import 'package:googlemap/utils/image/images.dart';
 
-
-class CustomMarkar extends StatefulWidget {
-  CustomMarkar({super.key});
+class CustomInfoPlace extends StatefulWidget {
+  const CustomInfoPlace({super.key});
 
   @override
   State<CustomInfoPlace> createState() => _CustomInfoPlaceState();
@@ -20,10 +19,10 @@ class _CustomInfoPlaceState extends State<CustomInfoPlace> {
     zoom: 14.1445,
   );
 
-  final CustomInfoWindowController _customInfoWindowController =
+  CustomInfoWindowController _customInfoWindowController =
   CustomInfoWindowController();
 
-  List<Marker> _markers = [];
+  List<Marker> _markers = <Marker>[];
   List<LatLng> _listLatLng = [
     LatLng(23.8017531667528, 90.43260825148754),
     LatLng(23.795470570291073, 90.41372550210008),
@@ -31,19 +30,19 @@ class _CustomInfoPlaceState extends State<CustomInfoPlace> {
     LatLng(23.79719831460473, 90.39295447777386),
   ];
 
-  final List<String> imagePlace = [
+  final List imagePlace = [
     AppImages.mirpur,
     AppImages.mirpur,
     AppImages.mirpur,
     AppImages.mirpur,
   ];
-  final List<String> placeTitle = [
+  final List<dynamic> placeTitle = [
     "Mirpur 10",
     "Mirpur 11",
     "Mirpur 12",
     "Mirpur 13",
   ];
-  final List<String> placeSubtitle = [
+  final List<dynamic> placeSubtitle = [
     "Dhaka Mirpur 10",
     "Dhaka Mirpur 11",
     "Dhaka Mirpur 12",
@@ -53,10 +52,10 @@ class _CustomInfoPlaceState extends State<CustomInfoPlace> {
   @override
   void initState() {
     super.initState();
-    _loadMarkers();
+    LoadData();
   }
 
-  void _loadMarkers() {
+  LoadData() {
     for (int i = 0; i < _listLatLng.length; i++) {
       _markers.add(
         Marker(
@@ -66,7 +65,7 @@ class _CustomInfoPlaceState extends State<CustomInfoPlace> {
           onTap: () {
             _customInfoWindowController.addInfoWindow!(
               Container(
-                height: 150,
+                height: 100,
                 width: 300,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.red),
@@ -74,28 +73,35 @@ class _CustomInfoPlaceState extends State<CustomInfoPlace> {
                   color: Colors.white,
                 ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                      child: Image.asset(
-                        imagePlace[i],
-                        height: 100,
-                        width: 300,
-                        fit: BoxFit.cover,
+                    Container(
+                      height: 100,
+                      width: 300,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(imagePlace[i]),
+                          fit: BoxFit.fitWidth,
+                          filterQuality: FilterQuality.high,
+                        ),
+                        border: Border.all(color: Colors.red),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
-                          Text(placeTitle[i], style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(child: Text(placeTitle[i])),
                           Spacer(),
-                          Text("120km", style: TextStyle(color: Colors.grey[700])),
+                          Text("120km"),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(placeSubtitle[i]),
                     ),
                   ],
@@ -112,37 +118,37 @@ class _CustomInfoPlaceState extends State<CustomInfoPlace> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Custom Info Window"), centerTitle: true),
+      appBar: AppBar(title: Text("CustomInfoPlace"), centerTitle: true),
       body: Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: _cameraPosition,
-            markers: Set.of(_markers),
-            onTap: (position) {
-              _customInfoWindowController.hideInfoWindow!();
-            },
-            onCameraMove: (position) {
-              _customInfoWindowController.onCameraMove!();
-            },
-            onMapCreated: (controller) {
-              _completer.complete(controller);
-              _customInfoWindowController.googleMapController = controller;
-            },
-          ),
-          CustomInfoWindow(
-            controller: _customInfoWindowController,
-            height: 150,
-            width: 300,
-            offset: 50,
-          ),
-        ],
+          children: [
+            CustomInfoWindow(
+              controller: _customInfoWindowController,
+              height: 100,
+              width: 300,
+              offset: 35,
+            ),
+            Container(
+              height: 500,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              child: GoogleMap(
+                markers: Set.of(_markers),
+                initialCameraPosition: _cameraPosition,
+                onTap: (position){
+                  _customInfoWindowController.hideInfoWindow!();
+                },
+                onMapCreated: (GoogleMapController controller) {
+                  _customInfoWindowController.googleMapController=controller;
+                },
+                onCameraMove: (position){
+                  _customInfoWindowController.onCameraMove!();
+                },
+              ),
+            ),
+          ]
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _customInfoWindowController.dispose();
-    super.dispose();
   }
 }
